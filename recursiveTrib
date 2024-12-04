@@ -1,0 +1,119 @@
+.data
+prompt0: .asciiz "Enter tribonacci(0): " 
+prompt1: .asciiz "Enter tribonacci(1): "
+prompt2: .asciiz "Enter tribonacci(2): " 
+promptN: .asciiz "Enter n: "                      
+equals:  .asciiz " = "                
+                 
+
+.text
+main:
+    # Input tribonacci(0)
+    la $a0, prompt0          
+    li $v0, 4                
+    syscall
+get_trib0:
+    li $v0, 5               
+    syscall
+    bltz $v0, get_trib0      
+    move $t0, $v0           
+
+    # Input tribonacci(1)
+    la $a0, prompt1
+    li $v0, 4
+    syscall
+get_trib1:
+    li $v0, 5
+    syscall
+    bltz $v0, get_trib1
+    move $t1, $v0         
+
+    # Input tribonacci(2)
+    la $a0, prompt2
+    li $v0, 4
+    syscall
+get_trib2:
+    li $v0, 5
+    syscall
+    bltz $v0, get_trib2
+    move $t2, $v0            
+
+    
+    la $a0, promptN
+    li $v0, 4
+    syscall
+get_n:
+    li $v0, 5
+    syscall
+    bltz $v0, get_n
+    move $t3, $v0            
+    
+    # Call the recursive function
+    move $a0, $t0           
+    move $a1, $t1           
+    move $a2, $t2            
+    move $a3, $t3            
+    jal recursiveTrib        # Call the recursive function
+    move $t4, $v0            
+
+    # Print the result
+    move $a0, $t3            
+    li $v0, 1
+    syscall                  # Print n
+
+    la $a0, equals           
+    li $v0, 4
+    syscall                  # Print = 
+
+    move $a0, $t4            
+    li $v0, 1
+    syscall                  # Print the result
+
+    
+    li $v0, 10               # Exit (10)
+    syscall
+
+# Recursive function 
+recursiveTrib:
+    addi $sp, $sp, -16       # Allocate space 
+    sw $ra, 12($sp)          
+    sw $a0, 0($sp)           
+    sw $a1, 4($sp)           
+    sw $a2, 8($sp)          
+    sw $a3, 16($sp)          
+    # Base cases
+    beq $a3, 0, base_case_0  
+    beq $a3, 1, base_case_1   
+    beq $a3, 2, base_case_2  
+
+    # Recursive case
+    addi $a3, $a3, -1        # Calculate n-1
+    jal recursiveTrib        
+    move $t0, $v0           
+
+    addi $a3, $a3, -1        # Calculate n-2
+    jal recursiveTrib       
+    move $t1, $v0            
+
+    addi $a3, $a3, -1        # Calculate n-3
+    jal recursiveTrib        
+    move $t2, $v0            
+
+    add $v0, $t0, $t1        # v0 = tribonacci(n-1) + tribonacci(n-2)
+    add $v0, $v0, $t2        # v0 = v0 + tribonacci(n-3)
+    j return_trib
+
+base_case_0:
+    move $v0, $a0            # tribonacci(0)
+    j return_trib
+base_case_1:
+    move $v0, $a1            # tribonacci(1)
+    j return_trib
+base_case_2:
+    move $v0, $a2            # tribonacci(2)
+    j return_trib
+
+return_trib:
+    lw $ra, 12($sp)          # Restore return address
+    addi $sp, $sp, 16        # Deallocate space
+    jr $ra                   
