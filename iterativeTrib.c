@@ -7,7 +7,7 @@ int main() {
     printf("Enter tribonacci(0): ");
     scanf("%d", &trib0);
     while (trib0 < 0) {
-        printf("Invalid input. Please enter a non-negative integer for tribonacci(0): ");
+        printf("Invalid input. Please enter a non-negative number for tribonacci(0): ");
         scanf("%d", &trib0);
     }
 
